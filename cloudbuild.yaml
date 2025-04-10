@@ -35,6 +35,9 @@ timeout: "3600s" # 1 hour timeout since model downloads may take time
 options:
   logging: "CLOUD_LOGGING_ONLY"
   machineType: "E2_HIGHCPU_8" # Use a higher spec machine for faster builds
+  dynamic_substitutions: true
+  pool:
+    name: "projects/${PROJECT_ID}/locations/asia-southeast1/workerPools/default"
 
 # Store the built images
 images:
@@ -44,4 +47,3 @@ images:
 # Substitution variables
 substitutions:
   _HUGGINGFACE_TOKEN: "" # Set this in your build trigger or command line
-  _PROJECT_ID: "${PROJECT_ID}" # Automatically set by Cloud Build
