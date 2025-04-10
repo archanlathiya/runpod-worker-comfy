@@ -1,0 +1,47 @@
+steps:
+  # Build the Docker image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "--build-arg",
+        "HUGGINGFACE_ACCESS_TOKEN=${_HUGGINGFACE_TOKEN}",
+        "-t",
+        "gcr.io/${PROJECT_ID}/comfyui-flux:latest",
+        ".",
+      ]
+
+  # Push the image to Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/${PROJECT_ID}/comfyui-flux:latest"]
+
+  # Tag specific version if needed
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "tag",
+        "gcr.io/${PROJECT_ID}/comfyui-flux:latest",
+        "gcr.io/${PROJECT_ID}/comfyui-flux:v1.0.0",
+      ]
+
+  # Push version tag
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/${PROJECT_ID}/comfyui-flux:v1.0.0"]
+
+# Set timeout for the build
+timeout: "3600s" # 1 hour timeout since model downloads may take time
+
+# Configure service account and logs
+options:
+  logging: "CLOUD_LOGGING_ONLY"
+  machineType: "E2_HIGHCPU_8" # Use a higher spec machine for faster builds
+
+# Store the built images
+images:
+  - "gcr.io/${PROJECT_ID}/comfyui-flux:latest"
+  - "gcr.io/${PROJECT_ID}/comfyui-flux:v1.0.0"
+
+# Substitution variables
+substitutions:
+  _HUGGINGFACE_TOKEN: "" # Set this in your build trigger or command line
+  _PROJECT_ID: "${PROJECT_ID}" # Automatically set by Cloud Build
